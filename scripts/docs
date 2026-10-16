@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+go tool tfplugindocs generate \
+  --provider-name mailboxorg \
+  --rendered-website-dir docs \
+  --website-source-dir templates/docs
