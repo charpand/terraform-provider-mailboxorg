@@ -1,0 +1,63 @@
+# Terraform provider for mailbox.org
+
+A Terraform provider for [mailbox.org](https://mailbox.org), built on the
+[JSON-RPC API](https://api.mailbox.org/v1/doc/methods/index.html).
+
+**Status:** pre-release. The first release (0.1.0) is read-only.
+
+## Supported
+
+| Type | Name | API method |
+|---|---|---|
+| Data source | `mailboxorg_domain` | `domain.get` |
+
+## Usage
+
+```hcl
+terraform {
+  required_providers {
+    mailboxorg = {
+      source = "charpand/mailboxorg"
+    }
+  }
+}
+
+provider "mailboxorg" {
+  # or MAILBOXORG_USERNAME / MAILBOXORG_PASSWORD
+  username = var.mailboxorg_username
+  password = var.mailboxorg_password
+}
+
+data "mailboxorg_domain" "example" {
+  domain = "example.com"
+}
+```
+
+| Attribute | Environment variable | Default |
+|---|---|---|
+| `username` | `MAILBOXORG_USERNAME` | |
+| `password` | `MAILBOXORG_PASSWORD` | |
+| `base_url` | `MAILBOXORG_BASE_URL` | `https://api.mailbox.org/v1/` |
+| `timeout` (seconds) | `MAILBOXORG_TIMEOUT` | `60` |
+
+The API user's level (admin, reseller, account, domain, mail) decides which
+methods it may call; API errors are reported unchanged.
+
+## Known limitations
+
+- The API documents no "not found" error code, so a missing domain is reported
+  as the API's own error rather than a dedicated message.
+- Field types of `domain.get` are not documented; values are returned as text.
+
+## Development
+
+```sh
+make bootstrap   # go mod tidy
+make all         # format, lint, test, docs, validate
+```
+
+Unit tests need no credentials: they run against a fake JSON-RPC server
+(`internal/testutils`) and require a `terraform` binary on `PATH`.
+Releases are cut by pushing a `v*` tag; CI builds and signs them with GoReleaser.
+
+Licensed under the MIT License.
