@@ -45,9 +45,13 @@ methods it may call; API errors are reported unchanged.
 
 ## Known limitations
 
-- The API documents no "not found" error code, so a missing domain is reported
-  as the API's own error rather than a dedicated message.
-- Field types of `domain.get` are not documented; values are returned as text.
+- The API has no "not found" error: an unknown domain and a domain the account
+  may not manage both return error 8 ("no permission"). The data source reports
+  this as "Domain not found or not manageable".
+- API error messages are localised by mailbox.org (German on German accounts);
+  the provider only ever acts on the numeric error code.
+- Values of `domain.get` are returned as text, as the API returns them (for
+  example `status` is `registriert`).
 
 ## Development
 
