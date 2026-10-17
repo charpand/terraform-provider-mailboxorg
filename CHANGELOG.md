@@ -11,3 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provider configuration through `username`, `password`, `base_url` and `timeout`, or the matching `MAILBOXORG_*` environment variables
 - `mailboxorg_domain` data source backed by `domain.get`
 - JSON-RPC client with a lazily created, shared session that is renewed once when the API reports it invalid, for read calls only
+
+### Changed
+- `mailboxorg_domain` reports API error 8 as "Domain not found or not manageable", since the API does not distinguish a missing domain from one the account may not manage
