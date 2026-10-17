@@ -46,6 +46,44 @@ reseller manages accounts, and domains belong to an account, so a login that
 does not manage the domain gets API error 8 (see below). Other API errors are
 reported unchanged.
 
+## Multiple logins
+
+A reseller manages accounts, and each account manages its own domains and
+mailboxes, so you may need more than one login in a single configuration and
+state. Use provider aliases, each with credentials of its own, and select one
+per resource or data source with `provider`:
+
+```hcl
+provider "mailboxorg" {
+  alias    = "reseller"
+  username = var.reseller_username
+  password = var.reseller_password
+}
+
+provider "mailboxorg" {
+  alias    = "account"
+  username = var.account_username
+  password = var.account_password
+}
+
+data "mailboxorg_domain" "example" {
+  provider = mailboxorg.account
+  domain   = "example.com"
+}
+```
+
+- `MAILBOXORG_USERNAME` and `MAILBOXORG_PASSWORD` only apply to a provider block
+  that does not set `username`/`password` itself. With several logins, set the
+  credentials per alias, for example from `sensitive` variables.
+- Every alias is a separate configured provider with its own client and its own
+  mailbox.org session, so the logins do not interfere with each other.
+- A module that needs a non-default login declares `configuration_aliases` and
+  receives the provider from its caller (`providers = { mailboxorg.account = mailboxorg.account }`).
+- Terraform cannot create providers dynamically with `for_each`; every login
+  needs its own provider block (OpenTofu 1.9+ supports `for_each` on providers).
+- Passwords passed as variables can end up in plan files and state. Do not
+  commit them in `.tfvars` files.
+
 ## Known limitations
 
 - The API has no "not found" error: an unknown domain and a domain the account
