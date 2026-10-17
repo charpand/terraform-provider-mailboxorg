@@ -12,6 +12,7 @@ A Terraform provider for [mailbox.org](https://mailbox.org), built on the
 | Data source | `mailboxorg_domain` | `domain.get` |
 | Data source | `mailboxorg_domains` | `domain.list` |
 | Data source | `mailboxorg_mail` | `mail.get` |
+| Data source | `mailboxorg_mails` | `mail.list` |
 
 ## Usage
 
@@ -91,6 +92,10 @@ data "mailboxorg_domain" "example" {
 - The API has no "not found" error: an unknown domain and a domain the account
   may not manage both return error 8 ("no permission"). The data source reports
   this as "Domain not found or not manageable".
+- An unknown mail address is reported by `mail.get` as error 6 (a generic
+  database problem, with the detail `could not resolve mail_dn for <address>`),
+  a domain or address of someone else as error 8. `mailboxorg_mail` reports both
+  as "not found or not manageable" and shows the API's own message.
 - API error messages are localised by mailbox.org (German on German accounts);
   the provider only ever acts on the numeric error code.
 - Values of `domain.get` are returned as text, as the API returns them (for
