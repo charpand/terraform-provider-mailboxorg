@@ -32,3 +32,25 @@ func Get(ctx context.Context, c *client.Client, domain string) (*Domain, error) 
 	}
 	return &d, nil
 }
+
+// Entry is one row of domain.list.
+type Entry struct {
+	Domain     string      `json:"domain"`
+	CountMails jsonx.Count `json:"count_mails"`
+}
+
+// List returns the domains of an account (domain.list). filter may be empty.
+func List(ctx context.Context, c *client.Client, account, filter string) ([]Entry, error) {
+	if strings.TrimSpace(account) == "" {
+		return nil, errors.New("domains: account must not be empty")
+	}
+	params := map[string]string{"account": account}
+	if filter != "" {
+		params["filter"] = filter
+	}
+	var entries []Entry
+	if err := c.Read(ctx, "domain.list", params, &entries); err != nil {
+		return nil, err
+	}
+	return entries, nil
+}
