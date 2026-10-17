@@ -4,3 +4,4 @@ bin/
 /terraform-provider-mailboxorg
 .claude/settings.local.json
 planning/
+*.local.sh
