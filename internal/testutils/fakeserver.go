@@ -25,6 +25,7 @@ type Handler func(call Call) (result any, rpcErr *RPCError)
 type RPCError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // FakeServer is an httptest JSON-RPC server that records every call.
