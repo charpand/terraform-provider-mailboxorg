@@ -135,5 +135,5 @@ func (p *mailboxorgProvider) Resources(_ context.Context) []func() resource.Reso
 }
 
 func (p *mailboxorgProvider) DataSources(_ context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{NewDomainDataSource}
+	return []func() datasource.DataSource{NewDomainDataSource, NewDomainsDataSource}
 }
