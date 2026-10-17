@@ -16,6 +16,10 @@ import (
 
 var _ datasource.DataSourceWithConfigure = &mailDataSource{}
 
+// codeDatabaseProblem is the generic "database problem" error; mail.get uses it
+// for an unknown address (verified live), other methods use it for other failures.
+const codeDatabaseProblem = 6
+
 // NewMailDataSource returns the mailboxorg_mail data source.
 func NewMailDataSource() datasource.DataSource {
 	return &mailDataSource{}
@@ -45,6 +49,7 @@ type mailModel struct {
 	AllowNets            types.String `tfsdk:"allow_nets"`
 	UIDExtern            types.String `tfsdk:"uid_extern"`
 	Active               types.Bool   `tfsdk:"active"`
+	Capabilities         types.List   `tfsdk:"capabilities"`
 	Language             types.String `tfsdk:"language"`
 	CreationDate         types.String `tfsdk:"creation_date"`
 	DeletionDate         types.String `tfsdk:"deletion_date"`
@@ -91,6 +96,7 @@ func (d *mailDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 			"allow_nets":             computedString("Networks allowed to log in."),
 			"uid_extern":             computedString("External user ID."),
 			"active":                 computedBool("Whether the address is active."),
+			"capabilities":           computedStrings("Enabled capabilities, such as `MAIL_SPAMPROTECTION`."),
 			"language":               computedString("Language (RFC 5646)."),
 			"creation_date":          computedString("Creation date (YYYY-MM-DD)."),
 			"deletion_date":          computedString("Planned deletion date, if any."),
@@ -119,9 +125,10 @@ func (d *mailDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	}
 
 	m, err := mails.Get(ctx, d.client, state.Mail.ValueString())
-	if errors.Is(err, client.ErrForbidden) {
+	var apiErr *client.APIError
+	if errors.Is(err, client.ErrForbidden) || (errors.As(err, &apiErr) && apiErr.Code == codeDatabaseProblem) {
 		resp.Diagnostics.AddAttributeError(path.Root("mail"), "Mail address not found or not manageable",
-			fmt.Sprintf("mailbox.org refused access to %q (%s). The API gives this answer both for addresses that do not exist and for addresses this login may not manage.", state.Mail.ValueString(), err))
+			fmt.Sprintf("mailbox.org could not provide %q (%s). The API answers like this both for addresses that do not exist (error 6) and for addresses this login may not manage (error 8).", state.Mail.ValueString(), err))
 		return
 	}
 	if err != nil {
@@ -154,6 +161,7 @@ func (d *mailDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	state.AllowNets = text(m.AllowNets)
 	state.UIDExtern = text(m.UIDExtern)
 	state.Active = types.BoolValue(bool(m.Active))
+	state.Capabilities = list(m.Capabilities)
 	state.Language = text(m.Language)
 	state.CreationDate = text(m.CreationDateISO)
 	state.DeletionDate = text(m.DeletionDate)

@@ -12,7 +12,7 @@ import (
 
 // Mail is the subset of mail.get that is exposed. The API documentation does
 // not state field types, so tolerant jsonx types are used throughout. Postal
-// address fields and capabilities are intentionally not decoded yet.
+// address fields are intentionally not decoded.
 type Mail struct {
 	UID                  jsonx.Text     `json:"uid"`
 	Mail                 string         `json:"mail"`
@@ -33,13 +33,15 @@ type Mail struct {
 	UIDExtern            jsonx.Text     `json:"uid_extern"`
 	Active               jsonx.Flag     `json:"active"`
 	Language             jsonx.Text     `json:"language"`
+	Capabilities         jsonx.TextList `json:"capabilities"`
 	CreationDateISO      jsonx.Text     `json:"creation_date_iso"`
 	DeletionDate         jsonx.Text     `json:"deletion_date"`
 	MailArchiveEnabled   jsonx.Flag     `json:"mailarchive_enabled"`
 }
 
-// Get returns one mail address (mail.get). The API error for an unknown or
-// foreign address is returned unchanged (see client.ErrForbidden).
+// Get returns one mail address (mail.get). The API error is returned unchanged:
+// an address of another login gives code 8 (client.ErrForbidden), an unknown
+// address gives code 6 with the detail "could not resolve mail_dn for <address>".
 func Get(ctx context.Context, c *client.Client, mail string) (*Mail, error) {
 	if strings.TrimSpace(mail) == "" {
 		return nil, errors.New("mails: mail must not be empty")

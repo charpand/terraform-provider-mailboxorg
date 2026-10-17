@@ -29,7 +29,7 @@ func TestMailDataSource(t *testing.T) {
 			"plansavailable": []string{"light", "standard"}, "first_name": "A", "last_name": "B",
 			"inboxsave": "1", "require_reset_password": false, "forwards": []string{"x@example.org"},
 			"aliases": []string{}, "memo": nil, "active": 1, "language": "de",
-			"creation_date_iso": "2026-01-02", "mailarchive_enabled": true,
+			"creation_date_iso": "2026-01-02", "mailarchive_enabled": true, "capabilities": []string{"MAIL_SPAMPROTECTION"},
 			// Fields that must never be exposed.
 			"street": "Secret Street 1", "birthday": "1990-01-01",
 		}, nil
@@ -47,6 +47,7 @@ func TestMailDataSource(t *testing.T) {
 				resource.TestCheckResourceAttr("data.mailboxorg_mail.this", "forwards.0", "x@example.org"),
 				resource.TestCheckResourceAttr("data.mailboxorg_mail.this", "aliases.#", "0"),
 				resource.TestCheckResourceAttr("data.mailboxorg_mail.this", "creation_date", "2026-01-02"),
+				resource.TestCheckResourceAttr("data.mailboxorg_mail.this", "capabilities.0", "MAIL_SPAMPROTECTION"),
 				resource.TestCheckNoResourceAttr("data.mailboxorg_mail.this", "street"),
 			),
 		}},
@@ -63,6 +64,20 @@ func TestMailDataSourceExplainsNoPermission(t *testing.T) {
 		Steps: []resource.TestStep{{
 			Config:      fmt.Sprintf(mailProviderConfig, srv.URL),
 			ExpectError: regexp.MustCompile(`(?s)Mail address not found or not\s+manageable`),
+		}},
+	})
+}
+
+func TestMailDataSourceExplainsUnknownAddress(t *testing.T) {
+	srv := fakeAPI(t)
+	srv.Handle("mail.get", func(testutils.Call) (any, *testutils.RPCError) {
+		return nil, &testutils.RPCError{Code: 6, Message: "Es gab Probleme beim Datenbankzugriff", Data: "could not resolve mail_dn for a@example.com"}
+	})
+	resource.UnitTest(t, resource.TestCase{
+		ProtoV6ProviderFactories: protoV6Factories,
+		Steps: []resource.TestStep{{
+			Config:      fmt.Sprintf(mailProviderConfig, srv.URL),
+			ExpectError: regexp.MustCompile(`(?s)could not resolve mail_dn\s+for\s+a@example.com`),
 		}},
 	})
 }
