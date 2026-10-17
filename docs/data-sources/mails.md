@@ -28,7 +28,7 @@ output "addresses" {
 ### Optional
 
 - `domain` (String) List the addresses of this domain.
-- `query` (String) Search across all domains in addresses and names; `%` is a wildcard.
+- `query` (String) Search addresses and names; `%` is a wildcard. The search is scoped to the login: a reseller login finds nothing here, use `domain` instead.
 
 ### Read-Only
 
