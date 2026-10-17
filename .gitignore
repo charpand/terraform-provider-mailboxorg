@@ -5,3 +5,4 @@ bin/
 .claude/settings.local.json
 planning/
 *.local.sh
+tmp/
