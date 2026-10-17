@@ -59,3 +59,61 @@ func TestGetRejectsEmpty(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestListReadsAllPages(t *testing.T) {
+	srv := testutils.NewFakeServer(t)
+	srv.Handle("auth", func(testutils.Call) (any, *testutils.RPCError) {
+		return map[string]string{"session": "s", "level": "account"}, nil
+	})
+	srv.Handle("mail.list", func(call testutils.Call) (any, *testutils.RPCError) {
+		var p map[string]any
+		_ = json.Unmarshal(call.Params, &p)
+		switch p["page"] {
+		case float64(1):
+			return json.RawMessage(`{"totalHits":3,"totalPages":2,"results":[{"mail":"a@example.com","type":"inbox","forwards":["x@example.org"]},{"mail":"b@example.com"}]}`), nil
+		case float64(2):
+			return json.RawMessage(`{"totalHits":3,"totalPages":2,"results":[{"mail":"c@example.com","aliases":["d@example.com"]}]}`), nil
+		}
+		return json.RawMessage(`[]`), nil
+	})
+	c, err := client.New(client.Config{BaseURL: srv.URL, Username: "u", Password: "p"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := mails.List(context.Background(), c, mails.ListOptions{Domain: "example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 3 || got[0].Mail != "a@example.com" || got[2].Mail != "c@example.com" || got[0].Forwards.Strings()[0] != "x@example.org" {
+		t.Fatalf("unexpected entries %+v", got)
+	}
+	var pages int
+	for _, call := range srv.Calls() {
+		if call.Method == "mail.list" {
+			pages++
+		}
+	}
+	if pages != 2 {
+		t.Fatalf("want 2 page requests, got %d", pages)
+	}
+}
+
+func TestListHandlesBareEmptyArray(t *testing.T) {
+	srv := testutils.NewFakeServer(t)
+	srv.Handle("auth", func(testutils.Call) (any, *testutils.RPCError) {
+		return map[string]string{"session": "s", "level": "account"}, nil
+	})
+	srv.Handle("mail.list", func(testutils.Call) (any, *testutils.RPCError) { return json.RawMessage(`[]`), nil })
+	c, err := client.New(client.Config{BaseURL: srv.URL, Username: "u", Password: "p"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := mails.List(context.Background(), c, mails.ListOptions{Query: "%"})
+	if err != nil || len(got) != 0 {
+		t.Fatalf("got %v, %v", got, err)
+	}
+	if _, err := mails.List(context.Background(), c, mails.ListOptions{}); err == nil {
+		t.Fatal("expected error without domain or query")
+	}
+}
