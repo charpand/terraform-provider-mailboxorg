@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `mailboxorg_domains` data source backed by `domain.list`
 - `mailboxorg_mail` data source backed by `mail.get` (password and postal address data are not exposed)
 - `mailboxorg_mails` data source backed by `mail.list`, reading every page
+- Documented that `mailboxorg_mails` `query` is scoped to the login (empty for a reseller login)
 - API error messages now include the API's detail text when it sends one
 
 ## [0.1.0] - 2026-10-17

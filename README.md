@@ -92,6 +92,9 @@ data "mailboxorg_domain" "example" {
 - The API has no "not found" error: an unknown domain and a domain the account
   may not manage both return error 8 ("no permission"). The data source reports
   this as "Domain not found or not manageable".
+- `mailboxorg_mails` with `query` searches within the scope of the login: verified
+  with a customer login (finds the addresses across its domains) and a reseller
+  login (finds none). Use `domain` to list addresses with a reseller login.
 - An unknown mail address is reported by `mail.get` as error 6 (a generic
   database problem, with the detail `could not resolve mail_dn for <address>`),
   a domain or address of someone else as error 8. `mailboxorg_mail` reports both
