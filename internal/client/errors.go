@@ -37,6 +37,9 @@ type APIError struct {
 }
 
 func (e *APIError) Error() string {
+	if detail, ok := e.Data.(string); ok && detail != "" {
+		return fmt.Sprintf("mailbox.org %s: error %d: %s (%s)", e.Method, e.Code, e.Message, detail)
+	}
 	return fmt.Sprintf("mailbox.org %s: error %d: %s", e.Method, e.Code, e.Message)
 }
 

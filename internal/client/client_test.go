@@ -235,3 +235,14 @@ func TestNoPermissionCodeMatchesErrForbidden(t *testing.T) {
 		t.Fatalf("code 8 must not trigger a re-login, got %d logins", logins.Load())
 	}
 }
+
+func TestAPIErrorIncludesStringDetail(t *testing.T) {
+	err := &client.APIError{Method: "mail.get", Code: 6, Message: "db problem", Data: "could not resolve mail_dn for x@example.com"}
+	want := "mailbox.org mail.get: error 6: db problem (could not resolve mail_dn for x@example.com)"
+	if err.Error() != want {
+		t.Fatalf("got %q", err.Error())
+	}
+	if (&client.APIError{Method: "m", Code: 7, Message: "x", Data: map[string]any{"a": 1}}).Error() != "mailbox.org m: error 7: x" {
+		t.Fatal("non-string data must not be printed")
+	}
+}
