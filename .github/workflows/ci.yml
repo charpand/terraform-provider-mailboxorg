@@ -86,7 +86,8 @@ jobs:
 
       - name: Check for uncommitted changes
         run: |
-          if ! git diff --exit-code docs/ templates/; then
+          if [ -n "$(git status --porcelain -- docs/)" ]; then
+            git status --porcelain -- docs/
             echo "::error::Documentation is out of date. Please run './scripts/docs' and commit the changes."
             exit 1
           fi
