@@ -70,3 +70,32 @@ func TestGetRejectsEmptyDomain(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestListSendsFilterAndDecodes(t *testing.T) {
+	srv := testutils.NewFakeServer(t)
+	srv.Handle("auth", func(testutils.Call) (any, *testutils.RPCError) {
+		return map[string]string{"session": "s", "level": "account"}, nil
+	})
+	srv.Handle("domain.list", func(testutils.Call) (any, *testutils.RPCError) {
+		return json.RawMessage(`[{"domain":"a.example","count_mails":3},{"domain":"b.example","count_mails":"0"}]`), nil
+	})
+	c, err := client.New(client.Config{BaseURL: srv.URL, Username: "u", Password: "p"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := domains.List(context.Background(), c, "acme", "a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 || got[0].Domain != "a.example" || got[0].CountMails != 3 || got[1].CountMails != 0 {
+		t.Fatalf("unexpected entries %+v", got)
+	}
+	calls := srv.Calls()
+	if string(calls[len(calls)-1].Params) != `{"account":"acme","filter":"a"}` {
+		t.Fatalf("unexpected params %s", calls[len(calls)-1].Params)
+	}
+	if _, err := domains.List(context.Background(), c, " ", ""); err == nil {
+		t.Fatal("expected error for empty account")
+	}
+}
