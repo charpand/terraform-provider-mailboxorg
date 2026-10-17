@@ -2,12 +2,14 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/charpand/terraform-provider-mailboxorg/internal/client"
 	"github.com/charpand/terraform-provider-mailboxorg/internal/client/domains"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -71,6 +73,11 @@ func (d *domainDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 
 	res, err := domains.Get(ctx, d.client, state.Domain.ValueString())
+	if errors.Is(err, client.ErrForbidden) {
+		resp.Diagnostics.AddAttributeError(path.Root("domain"), "Domain not found or not manageable",
+			fmt.Sprintf("mailbox.org refused access to %q (%s). The API gives this answer both for domains that do not exist and for domains this account may not manage.", state.Domain.ValueString(), err))
+		return
+	}
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to read domain", err.Error())
 		return

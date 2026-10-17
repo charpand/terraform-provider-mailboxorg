@@ -110,3 +110,24 @@ data "mailboxorg_domain" "this" { domain = "nope.example" }
 		}},
 	})
 }
+
+func TestDomainDataSourceExplainsNoPermission(t *testing.T) {
+	srv := fakeAPI(t)
+	srv.Handle("domain.get", func(testutils.Call) (any, *testutils.RPCError) {
+		return nil, &testutils.RPCError{Code: 8, Message: "Sie haben keine Berechtigung, diese Domain zu administrieren"}
+	})
+	resource.UnitTest(t, resource.TestCase{
+		ProtoV6ProviderFactories: protoV6Factories,
+		Steps: []resource.TestStep{{
+			Config: fmt.Sprintf(`
+provider "mailboxorg" {
+  base_url = %q
+  username = "user"
+  password = "secret"
+}
+data "mailboxorg_domain" "this" { domain = "nope.example" }
+`, srv.URL),
+			ExpectError: regexp.MustCompile(`(?s)Domain not found or not\s+manageable`),
+		}},
+	})
+}

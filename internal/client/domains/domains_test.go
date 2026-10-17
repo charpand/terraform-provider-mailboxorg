@@ -45,6 +45,17 @@ func TestGetDecodesStringsNumbersAndNull(t *testing.T) {
 	}
 }
 
+func TestGetDecodesRealResponseShape(t *testing.T) {
+	c := setup(t, `{"domain":"example.com","context_id":"306297","status":"registriert","date_register":"2026-02-01","memo":"","plansavailable":["light","standard","premium"]}`)
+	d, err := domains.Get(context.Background(), c, "example.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if d.Status != "registriert" || d.ContextID != "306297" || d.DateRegister != "2026-02-01" || len(d.PlansAvailable) != 3 {
+		t.Fatalf("unexpected domain %+v", d)
+	}
+}
+
 func TestGetSurfacesAPIError(t *testing.T) {
 	c := setup(t, `{}`)
 	_, err := domains.Get(context.Background(), c, "missing.example")
