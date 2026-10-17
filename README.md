@@ -10,6 +10,8 @@ A Terraform provider for [mailbox.org](https://mailbox.org), built on the
 | Type | Name | API method |
 |---|---|---|
 | Data source | `mailboxorg_domain` | `domain.get` |
+| Data source | `mailboxorg_domains` | `domain.list` |
+| Data source | `mailboxorg_mail` | `mail.get` |
 
 ## Usage
 
