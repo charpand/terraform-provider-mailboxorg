@@ -40,8 +40,11 @@ data "mailboxorg_domain" "example" {
 | `base_url` | `MAILBOXORG_BASE_URL` | `https://api.mailbox.org/v1/` |
 | `timeout` (seconds) | `MAILBOXORG_TIMEOUT` | `60` |
 
-The API user's level (admin, reseller, account, domain, mail) decides which
-methods it may call; API errors are reported unchanged.
+The API user decides what can be read: `mailboxorg_domain` only works for
+domains the user manages (verified with a login that manages the domain). A
+reseller manages accounts, and domains belong to an account, so a login that
+does not manage the domain gets API error 8 (see below). Other API errors are
+reported unchanged.
 
 ## Known limitations
 

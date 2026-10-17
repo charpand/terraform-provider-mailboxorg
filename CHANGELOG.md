@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - `mailboxorg_domain` reports API error 8 as "Domain not found or not manageable", since the API does not distinguish a missing domain from one the account may not manage
+- Documented that `mailboxorg_domain` requires an API user that manages the domain
