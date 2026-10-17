@@ -218,3 +218,20 @@ func TestNewRequiresCredentials(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestNoPermissionCodeMatchesErrForbidden(t *testing.T) {
+	srv := testutils.NewFakeServer(t)
+	var logins atomic.Int32
+	srv.Handle("auth", authHandler(&logins))
+	srv.Handle("domain.get", func(testutils.Call) (any, *testutils.RPCError) {
+		return nil, &testutils.RPCError{Code: 8, Message: "Sie haben keine Berechtigung, diese Domain zu administrieren"}
+	})
+
+	err := newClient(t, srv.URL).Read(context.Background(), "domain.get", nil, nil)
+	if !errors.Is(err, client.ErrForbidden) || errors.Is(err, client.ErrAuthentication) {
+		t.Fatalf("want ErrForbidden only, got %v", err)
+	}
+	if logins.Load() != 1 {
+		t.Fatalf("code 8 must not trigger a re-login, got %d logins", logins.Load())
+	}
+}

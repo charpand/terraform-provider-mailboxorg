@@ -8,12 +8,17 @@ import (
 // Documented mailbox.org JSON-RPC error codes.
 const (
 	codeAccessDenied  = 2
+	codeNoPermission  = 8
 	codeInvalidAuthID = 253
 )
 
 var (
 	// ErrAuthentication is returned when credentials or the session are rejected.
 	ErrAuthentication = errors.New("authentication failed")
+	// ErrForbidden is returned when the API refuses access to an object (code 8).
+	// The API uses it both for objects the caller may not manage and for objects
+	// that do not exist, so the two cannot be told apart.
+	ErrForbidden = errors.New("not permitted or does not exist")
 	// ErrTransport is returned when a request could not be completed or answered.
 	ErrTransport = errors.New("transport error")
 	// ErrDecode is returned when a response is not a valid JSON-RPC answer.
@@ -35,7 +40,14 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("mailbox.org %s: error %d: %s", e.Method, e.Code, e.Message)
 }
 
-// Is lets errors.Is(err, ErrAuthentication) match the documented auth codes.
+// Is lets errors.Is match the auth and permission codes. Messages are localised
+// by the API, so only the numeric code is ever inspected.
 func (e *APIError) Is(target error) bool {
-	return target == ErrAuthentication && (e.Code == codeAccessDenied || e.Code == codeInvalidAuthID)
+	switch target {
+	case ErrAuthentication:
+		return e.Code == codeAccessDenied || e.Code == codeInvalidAuthID
+	case ErrForbidden:
+		return e.Code == codeNoPermission
+	}
+	return false
 }
