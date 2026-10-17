@@ -37,6 +37,7 @@ output "mailbox_plan" {
 - `aliases` (List of String) Alias addresses.
 - `allow_nets` (String) Networks allowed to log in.
 - `alternate_mail` (String) Alternate (recovery) mail address.
+- `capabilities` (List of String) Enabled capabilities, such as `MAIL_SPAMPROTECTION`.
 - `creation_date` (String) Creation date (YYYY-MM-DD).
 - `deletion_date` (String) Planned deletion date, if any.
 - `first_name` (String) First name.
