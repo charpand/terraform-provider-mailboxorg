@@ -10,7 +10,7 @@ import (
 
 func TestDomainsDataSource(t *testing.T) {
 	srv := fakeAPI(t)
-	srv.Handle("domain.list", func(call testutils.Call) (any, *testutils.RPCError) {
+	srv.Handle("domain.list", func(testutils.Call) (any, *testutils.RPCError) {
 		return []map[string]any{{"domain": "a.example", "count_mails": 3}, {"domain": "b.example", "count_mails": "0"}}, nil
 	})
 	resource.UnitTest(t, resource.TestCase{
