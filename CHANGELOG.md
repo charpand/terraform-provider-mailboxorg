@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- CI jobs run on CRACI runners (`runs-on: craci`, arm64 through the `craci-slim-arm` image) instead of GitHub's `ubuntu-26.04-arm` runners
+
 ## [0.2.0] - 2026-10-17
 
 ### Added
