@@ -124,6 +124,9 @@ jobs:
     timeout-minutes: 30
     name: release
     runs-on: ubuntu-26.04-arm
+    # Holds the signing secrets (GPG_PRIVATE_KEY, PASSPHRASE): only tag builds
+    # can use them, and the environment can require a manual approval.
+    environment: release
     permissions:
       contents: write
     steps:
