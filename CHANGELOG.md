@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI: a `Security` workflow (`security.yml`) for the scanning, on pushes, pull requests and daily; it runs `zizmor` (static analysis of the workflows), `govulncheck` (reachable Go vulnerabilities), CodeQL (Go and workflows), `gitleaks` (secrets in the full history; pinned in `mise.toml`) and, on pull requests, dependency review
 - CI: `harden-runner` in audit mode records the network egress of the `ci.yml` and `security.yml` jobs, and the lint job runs `go mod verify`
 - Releases attest signed SLSA build provenance for every archive (`gh attestation verify`); `SECURITY.md` documents how to verify a release and offers private vulnerability reporting on GitHub
+- CI: OpenSSF Scorecard (`scorecard.yml`), weekly and on pushes to `main`, with a badge in the README
 
 ### Changed
 - CI installs Go, golangci-lint, Terraform and Node through `jdx/mise-action` at the versions in `mise.toml` and `mise.lock`, so CI uses the same tools as a local checkout; before, the lint job had no golangci-lint and `./scripts/lint` fell back to `go vet`
