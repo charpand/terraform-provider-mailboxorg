@@ -3,6 +3,7 @@ name: Security
 # Everything that looks for supply-chain and security problems, in one place:
 #   sbom, trivy, grype   known-vulnerable modules in the compiled provider
 #   govulncheck          vulnerabilities the provider actually reaches
+#   codeql               semantic scanning of the Go code and the workflows
 #   zizmor               static analysis of the GitHub Actions workflows
 # Also runs daily: new advisories appear without any commit to this repository.
 # Build, test and release live in ci.yml.
@@ -121,6 +122,42 @@ jobs:
           repo-checkout: false
           go-version-file: go.mod
           go-package: ./...
+
+  analyze:
+    name: analyze (${{ matrix.language }})
+    timeout-minutes: 30
+    runs-on: ubuntu-26.04-arm
+    permissions:
+      contents: read
+      security-events: write # upload results
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - go
+          - actions
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      # The Go version pinned in mise.toml, so the build matches CI.
+      - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
+        if: matrix.language == 'go'
+        with:
+          install_args: go
+          cache: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.language == 'go' && 'autobuild' || 'none' }}
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          category: /language:${{ matrix.language }}
 
   zizmor:
     name: zizmor
