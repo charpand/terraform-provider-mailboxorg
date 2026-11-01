@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - CI: a `Security` workflow (`security.yml`) for the scanning, on pushes, pull requests and daily; it runs `zizmor` (static analysis of the workflows), `govulncheck` (reachable Go vulnerabilities), CodeQL (Go and workflows), `gitleaks` (secrets in the full history; pinned in `mise.toml`) and, on pull requests, dependency review
 - CI: `harden-runner` in audit mode records the network egress of the `ci.yml` and `security.yml` jobs, and the lint job runs `go mod verify`
+- Releases attest signed SLSA build provenance for every archive (`gh attestation verify`); `SECURITY.md` documents how to verify a release and offers private vulnerability reporting on GitHub
 
 ### Changed
 - CI installs Go, golangci-lint, Terraform and Node through `jdx/mise-action` at the versions in `mise.toml` and `mise.lock`, so CI uses the same tools as a local checkout; before, the lint job had no golangci-lint and `./scripts/lint` fell back to `go vet`
 - CI: `jdx/mise-action` no longer caches, so a cache written by an earlier run cannot influence a release build
 - CI: the SBOM scans (`sbom`, `trivy`, `grype`) moved from `ci.yml` to `security.yml`, so they also run daily
+- CI: the release job runs in the `release` environment
 - CI checks that `go.mod` and `go.sum` are tidy (`go mod tidy -diff`) and that `./scripts/docs` leaves no new or changed files in `docs/` or `templates/`; the test job no longer runs `go mod tidy`
 - CI uses one concurrency group per ref: a newer push cancels a pull request's older run, while runs on `main` and on tags always complete; checkouts do not keep the token, and GoReleaser stays on v2
 
