@@ -129,6 +129,8 @@ jobs:
     environment: release
     permissions:
       contents: write
+      id-token: write # keyless signing of the build provenance (Sigstore)
+      attestations: write # store the provenance attestation
     steps:
       # Records the job's network egress (audit mode) as the baseline for a
       # later allowlist.
@@ -176,3 +178,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GPG_PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
+      # Signed SLSA build provenance for every archive listed in the checksum
+      # file, tying each artifact to this workflow run and commit. Verify with
+      #   gh attestation verify <archive> --repo charpand/terraform-provider-mailboxorg
+      - name: Locate checksum file
+        id: checksums
+        run: |
+          file="$(ls dist/*_SHA256SUMS)"
+          echo "file=$file" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-checksums: ${{ steps.checksums.outputs.file }}
