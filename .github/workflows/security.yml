@@ -2,6 +2,7 @@ name: Security
 
 # Everything that looks for supply-chain and security problems, in one place:
 #   sbom, trivy, grype   known-vulnerable modules in the compiled provider
+#   govulncheck          vulnerabilities the provider actually reaches
 #   zizmor               static analysis of the GitHub Actions workflows
 # Also runs daily: new advisories appear without any commit to this repository.
 # Build, test and release live in ci.yml.
@@ -102,6 +103,24 @@ jobs:
           only-fixed: true
           fail-build: true
           cache-db: true
+
+  govulncheck:
+    name: govulncheck
+    timeout-minutes: 10
+    runs-on: ubuntu-26.04-arm
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Run govulncheck
+        uses: golang/govulncheck-action@032d45514ae346b1db93c04b0c90b841c370344f # v1.1.0
+        with:
+          repo-checkout: false
+          go-version-file: go.mod
+          go-package: ./...
 
   zizmor:
     name: zizmor
