@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- CI: a `Security` workflow (`security.yml`) for the scanning, on pushes, pull requests and daily; it runs `zizmor` (static analysis of the workflows)
+- CI: a `Security` workflow (`security.yml`) for the scanning, on pushes, pull requests and daily; it runs `zizmor` (static analysis of the workflows), `govulncheck` (reachable Go vulnerabilities), CodeQL (Go and workflows), `gitleaks` (secrets in the full history; pinned in `mise.toml`) and, on pull requests, dependency review
 
 ### Changed
 - CI installs Go, golangci-lint, Terraform and Node through `jdx/mise-action` at the versions in `mise.toml` and `mise.lock`, so CI uses the same tools as a local checkout; before, the lint job had no golangci-lint and `./scripts/lint` fell back to `go vet`
