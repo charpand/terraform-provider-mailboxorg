@@ -8,7 +8,8 @@ name: Security
 #   zizmor               static analysis of the GitHub Actions workflows
 #   dependency-review    new vulnerable dependencies, pull requests only
 # Also runs daily: new advisories appear without any commit to this repository.
-# Build, test and release live in ci.yml.
+# Build, test and release live in ci.yml; OpenSSF Scorecard stays in
+# scorecard.yml because its publish verification restricts the workflow shape.
 # Dependency and code scanning by Snyk runs through the Snyk GitHub App
 # (`security/snyk` and `code/snyk` commit statuses), not in this workflow.
 

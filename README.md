@@ -1,5 +1,7 @@
 # Terraform provider for mailbox.org
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/charpand/terraform-provider-mailboxorg/badge)](https://scorecard.dev/viewer/?uri=github.com/charpand/terraform-provider-mailboxorg)
+
 A Terraform provider for [mailbox.org](https://mailbox.org), built on the
 [JSON-RPC API](https://api.mailbox.org/v1/doc/methods/index.html).
 
