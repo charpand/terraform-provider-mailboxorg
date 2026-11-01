@@ -4,6 +4,7 @@ name: Security
 #   sbom, trivy, grype   known-vulnerable modules in the compiled provider
 #   govulncheck          vulnerabilities the provider actually reaches
 #   codeql               semantic scanning of the Go code and the workflows
+#   gitleaks             committed secrets, full history
 #   zizmor               static analysis of the GitHub Actions workflows
 # Also runs daily: new advisories appear without any commit to this repository.
 # Build, test and release live in ci.yml.
@@ -158,6 +159,26 @@ jobs:
         uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           category: /language:${{ matrix.language }}
+
+  gitleaks:
+    name: gitleaks
+    timeout-minutes: 10
+    runs-on: ubuntu-26.04-arm
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: '0'
+          persist-credentials: false
+
+      - uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
+        with:
+          install_args: gitleaks
+          cache: false
+
+      - name: Scan history for secrets
+        run: gitleaks git --redact --no-banner --verbose
 
   zizmor:
     name: zizmor
