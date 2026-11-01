@@ -2,6 +2,7 @@ name: Security
 
 # Everything that looks for supply-chain and security problems, in one place:
 #   sbom, trivy, grype   known-vulnerable modules in the compiled provider
+#   zizmor               static analysis of the GitHub Actions workflows
 # Also runs daily: new advisories appear without any commit to this repository.
 # Build, test and release live in ci.yml.
 # Dependency and code scanning by Snyk runs through the Snyk GitHub App
@@ -101,3 +102,20 @@ jobs:
           only-fixed: true
           fail-build: true
           cache-db: true
+
+  zizmor:
+    name: zizmor
+    timeout-minutes: 10
+    runs-on: ubuntu-26.04-arm
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
+        with:
+          # Fail the check on findings instead of uploading SARIF only.
+          advanced-security: false
