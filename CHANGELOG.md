@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `./scripts/setup-hooks` installs a pre-commit hook (`scripts/pre-commit`) that formats, tidies `go.mod`, lints and scans the staged changes for secrets with `gitleaks`, so a leaked secret is caught before the push rather than by CI
+
 ### Changed
 - Renovate: `renovate.json` now extends `config:best-practices` (digest pinning) and automerges minor and patch updates for GitHub Actions, Go modules, Terraform and mise, grouped by ecosystem; it was an empty config before, and it requests reviews from the `maintainers` team. The rules match `terraform-provider-openprovider`
 
