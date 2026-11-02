@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-02
+
 ### Added
 - CI: a `Security` workflow (`security.yml`) for the scanning, on pushes, pull requests and daily; it runs `zizmor` (static analysis of the workflows), `govulncheck` (reachable Go vulnerabilities), CodeQL (Go and workflows), `gitleaks` (secrets in the full history; pinned in `mise.toml`) and, on pull requests, dependency review
 - CI: `harden-runner` in audit mode records the network egress of the `ci.yml` and `security.yml` jobs, and the lint job runs `go mod verify`
