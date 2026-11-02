@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Renovate: `renovate.json` now extends `config:best-practices` (digest pinning) and automerges minor and patch updates for GitHub Actions, Go modules, Terraform and mise, grouped by ecosystem; it was an empty config before, and it requests reviews from the `maintainers` team. The rules match `terraform-provider-openprovider`
+
 ## [0.2.1] - 2026-11-02
 
 ### Added

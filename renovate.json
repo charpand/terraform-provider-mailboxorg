@@ -1,3 +1,104 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices"],
+  "semanticCommits": "enabled",
+  "rebaseWhen": "conflicted",
+  "prHourlyLimit": 5,
+  "reviewers": ["team:maintainers"],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "groupName": "Go language version",
+      "rangeStrategy": "bump"
+    },
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "golang-x",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "golang.org/x/{/,}**"
+      ]
+    },
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "google-golang",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "google.golang.org/{/,}**"
+      ]
+    },
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "hashicorp",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "github.com/hashicorp/{/,}**"
+      ]
+    },
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "Go dependencies",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackageNames": [
+        "!golang.org/x/{/,}**",
+        "!google.golang.org/{/,}**",
+        "!github.com/hashicorp/{/,}**"
+      ]
+    },
+    {
+      "matchManagers": ["terraform"],
+      "groupName": "Terraform",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "matchManagers": ["mise"],
+      "groupName": "mise",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/renovatebot/renovate"],
+      "groupName": "renovate self-hosted image",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "merge-commit",
+      "matchUpdateTypes": ["minor", "patch", "digest"]
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["ghcr.io/renovatebot/renovate"],
+      "pinDigests": false
+    }
+  ]
 }
