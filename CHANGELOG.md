@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Renovate: `renovate.json` now extends `config:best-practices` (digest pinning) and automerges minor and patch updates for GitHub Actions, Go modules, Terraform and mise, grouped by ecosystem; it was an empty config before, and it requests reviews from the `maintainers` team. The rules match `terraform-provider-openprovider`
 
+## [0.2.2] - 2026-11-17
+
+### Fixed
+- Release: `SHA256SUMS` lists only the archives and the registry manifest, not the SBOMs. In v0.2.1 it listed the `.cdx.json` files too, and the Terraform Registry rejected the release with `missing files in request body`; the SBOMs are still attached to the release
+
 ## [0.2.1] - 2026-11-02
 
 ### Added
